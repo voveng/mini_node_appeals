@@ -1,10 +1,11 @@
 import { Request, Response, RequestHandler } from "express";
 import AppealService from "@services/appeal.service.js";
 import { z } from "zod";
+import logger from "../utils/logger.js";
 
 const createAppealSchema = z.object({
-  theme: z.string(),
-  message: z.string(),
+  theme: z.string().min(2, "Theme cannot be empty"),
+  message: z.string().min(2, "Message cannot be empty"),
 });
 
 class AppealController {
@@ -30,12 +31,13 @@ class AppealController {
     try {
       const { theme, message } = createAppealSchema.parse(req.body);
       const appeal = await this.appealService.createAppeal(theme, message);
+      logger.info(`Appeal created successfully: ${appeal.id}`);
       res.status(201).json(appeal);
     } catch (error) {
       if (error instanceof z.ZodError) {
         res.status(400).json({ errors: error.issues });
       } else {
-        console.error(error);
+        logger.error(error);
         res.status(500).json({ message: "Ошибка при создании обращения" });
       }
     }
@@ -45,9 +47,10 @@ class AppealController {
     const { id } = req.params;
     try {
       const appeal = await this.appealService.startProcessing(Number(id));
+      logger.info(`Appeal ${id} started processing successfully.`);
       res.json(appeal);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       res.status(500).json({ message: "Ошибка при обработке обращения" });
     }
   };
@@ -60,9 +63,10 @@ class AppealController {
         Number(id),
         solution,
       );
+      logger.info(`Appeal ${id} completed successfully.`);
       res.json(appeal);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       res.status(500).json({ message: "Ошибка при завершении обращения" });
     }
   };
@@ -72,9 +76,10 @@ class AppealController {
     const { reason } = req.body;
     try {
       const appeal = await this.appealService.cancelAppeal(Number(id), reason);
+      logger.info(`Appeal ${id} cancelled successfully.`);
       res.json(appeal);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       res.status(500).json({ message: "Ошибка при отмене обращения" });
     }
   };
@@ -82,9 +87,10 @@ class AppealController {
   cancelAllInProgress: RequestHandler = async (req, res) => {
     try {
       const appeals = await this.appealService.cancelAllInProgress();
+      logger.info(`Cancelled ${appeals.length} in-progress appeals.`);
       res.json(appeals);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       res.status(500).json({ message: "Ошибка при отмене обращений" });
     }
   };
@@ -97,9 +103,10 @@ class AppealController {
         startDate,
         endDate,
       );
+      logger.info(`Successfully retrieved appeals by dates. Found ${appeals.length} appeals.`);
       res.json(appeals);
     } catch (error) {
-      console.error(error);
+      logger.error(error);
       res.status(500).json({ message: "Ошибка при получении обращений" });
     }
   };

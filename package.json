@@ -15,10 +15,12 @@
   "dependencies": {
     "@types/express": "^5.0.1",
     "@types/node": "^22.15.18",
+    "@types/winston": "^2.4.4",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "sequelize": "^6.37.7",
     "sqlite3": "^5.1.7",
+    "winston": "^3.18.3",
     "zod": "^4.1.12"
   },
   "devDependencies": {
