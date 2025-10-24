@@ -1,6 +1,6 @@
 import express from "express";
-import Appeal from "../models/appeal.model";
-import appealRouter from "../routes/appeal.routes";
+import Appeal from "@models/appeal.model.js";
+import appealRouter from "@routes/appeal.routes.js";
 
 const app = express();
 app.use(express.json());
